@@ -1,8 +1,8 @@
-#include "../Templates/ProtogenProjectTemplate.h"
-#include "../../Assets/Models/FBX/RhaskyProtoV3CustomExpression.h"
-#include "../../Assets/Models/OBJ/DeltaDisplayBackground.h"
-#include "../../Camera/CameraManager/Implementations/HUB75DeltaCameras.h"
-#include "../../Controller/HUB75Controller.h"
+#include "Examples/Templates/ProtogenProjectTemplate.h"
+#include "Assets/Models/FBX/RhaskyProtoV3CustomExpression.h"
+#include "Assets/Models/OBJ/DeltaDisplayBackground.h"
+#include "Camera/CameraManager/Implementations/HUB75DeltaCameras.h"
+#include "Controller/HUB75Controller.h"
 
 class CaraProtogenProject : public ProtogenProject {
 private:
