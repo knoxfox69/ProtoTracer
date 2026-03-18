@@ -58,7 +58,7 @@ private:
     };
 
 public:
-    cara protogen prueba(){}
+    RhaskyProtoV3CustomExpression(){}
 
     Object3D* GetObject(){
         return &basisObj;
