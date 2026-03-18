@@ -37,6 +37,9 @@
 
 #elif defined(PROJECT_VERIFY_HARDWARE)
     #include "Examples/Protogen/ProtogenHardwareTest.h"
+
+#elif defined(PROJECT_RHASKY_PROTOGEN_V3)
+    #include "ProtogenRhasky/RhaskyProtogenV3.h"
 #else
     #error "No project defined! Please define one of PROJECT_PROTOGEN_HUB75, PROJECT_PROTOGEN_WS35, or PROJECT_VERIFY_ENGINE."
 #endif
