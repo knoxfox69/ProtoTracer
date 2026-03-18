@@ -40,6 +40,7 @@
 
 #elif defined(PROJECT_RHASKY_PROTOGEN_V3)
     #include "ProtogenRhasky/RhaskyProtogenV3.h"
+    RhaskyProtogenV3 project; ///< Instance of the Rhasky Protogen V3 project.
 #else
     #error "No project defined! Please define one of PROJECT_PROTOGEN_HUB75, PROJECT_PROTOGEN_WS35, or PROJECT_VERIFY_ENGINE."
 #endif
