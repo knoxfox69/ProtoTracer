@@ -16,6 +16,20 @@ private:
         F("SURPRISED"), F("FOCUSED"), F("BLINK"), F("CUSTOM")
     };
 
+    // Model Configuration Constants - Adjust these for proper alignment
+    static constexpr float MODEL_OFFSET_X = 96.0f;    // Horizontal offset (center screen)
+    static constexpr float MODEL_OFFSET_Y = 47.0f;    // Vertical offset (center screen)
+    static constexpr float MODEL_OFFSET_Z = -7.5f;    // Depth offset for face alignment
+    static constexpr float MODEL_SCALE    = 1.0f;     // Model scaling factor
+    static constexpr float MODEL_ROT_X    = 0.0f;     // Pitch (up/down)
+    static constexpr float MODEL_ROT_Y    = 180.0f;   // Yaw (left/right) - FIX: model facing backwards!
+    static constexpr float MODEL_ROT_Z    = 0.0f;     // Roll (clockwise/counter)
+
+    // Runtime transform values
+    Vector3D modelPosition;
+    Vector3D modelRotation;
+    float    modelScale;
+
     void LinkControlParameters() override {
         // Link morph weights to animation parameters
         AddParameter(RhaskyProtoV3CustomExpression::AddEyebrow, faceModel.GetMorphWeightReference(RhaskyProtoV3CustomExpression::AddEyebrow), 15);
@@ -69,11 +83,20 @@ private:
 
 public:
     RhaskyProtogenV3() : ProtogenProject(&cameras, &controller, 2, Vector2D(), Vector2D(192.0f, 94.0f), 22, 23, 8) {
+        // Initialize transform values from configuration constants
+        modelPosition = Vector3D(MODEL_OFFSET_X, MODEL_OFFSET_Y, MODEL_OFFSET_Z);
+        modelRotation = Vector3D(MODEL_ROT_X, MODEL_ROT_Y, MODEL_ROT_Z);
+        modelScale    = MODEL_SCALE;
+
         scene.AddObject(faceModel.GetObject());
         scene.AddObject(deltaDisplayBackground.GetObject());
 
         faceModel.GetObject()->SetMaterial(GetFaceMaterial());
         deltaDisplayBackground.GetObject()->SetMaterial(GetFaceMaterial());
+
+        // Apply base transform once during initialization
+        faceModel.GetObject()->GetTransform()->SetRotation(modelRotation);
+        faceModel.GetObject()->GetTransform()->SetScale(Vector3D(modelScale, modelScale, modelScale));
 
         hud.SetFaceArray(faceArray);
         LinkControlParameters();
@@ -94,9 +117,14 @@ public:
         UpdateFace(ratio);
         faceModel.Update();
         
-        AlignObjectFace(faceModel.GetObject(), -7.5f);
-        faceModel.GetObject()->GetTransform()->SetPosition(GetWiggleOffset());
-        faceModel.GetObject()->UpdateTransform();
+        // Calculate final position (base offset + wiggle animation)
+        Vector3D finalPosition = modelPosition + GetWiggleOffset();
+        
+        // Apply clean transform chain
+        faceModel.GetObject()->GetTransform()->SetPosition(finalPosition);
+        
+        // Background should remain static
+        deltaDisplayBackground.GetObject()->GetTransform()->SetPosition(modelPosition);
     }
 
     void SelectFace(uint8_t code) {
@@ -124,4 +152,30 @@ public:
     void OscilloscopeCallback() override {
         AddMaterialFrame(Color::CHORIZONTALRAINBOW, 0.8f);
     }
+
+    // -------------------------------------------------------------------------
+    // Public Configuration API - Runtime adjustment for testing & calibration
+    // -------------------------------------------------------------------------
+    void SetModelPosition(const Vector3D& newPosition) {
+        modelPosition = newPosition;
+    }
+
+    void SetModelRotation(float x, float y, float z) {
+        modelRotation = Vector3D(x, y, z);
+        faceModel.GetObject()->GetTransform()->SetRotation(modelRotation);
+    }
+
+    void SetModelScale(float newScale) {
+        modelScale = newScale;
+        faceModel.GetObject()->GetTransform()->SetScale(Vector3D(modelScale, modelScale, modelScale));
+    }
+
+    void SetModelOffsetX(float x) { modelPosition.X = x; }
+    void SetModelOffsetY(float y) { modelPosition.Y = y; }
+    void SetModelOffsetZ(float z) { modelPosition.Z = z; }
+
+    // Getters for debugging
+    Vector3D GetModelPosition() const { return modelPosition; }
+    Vector3D GetModelRotation() const { return modelRotation; }
+    float    GetModelScale()    const { return modelScale; }
 };
